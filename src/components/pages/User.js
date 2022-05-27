@@ -2,12 +2,14 @@ import React, { useEffect, useContext, Fragment } from "react";
 import { useParams, Link } from "react-router-dom";
 import GithubContext from "../../context/github/GithubContext";
 import Loader from "../layout/Loader";
+import RepoList from "../repos/RepoList";
 
 // icons
 import { FaCodepen, FaStore, FaUserFriends, FaUsers } from "react-icons/fa";
 
 function User(props) {
-  const { getUser, user, loading } = useContext(GithubContext);
+  const { getUser, user, loading, getUserRepos, repos } =
+    useContext(GithubContext);
 
   const params = useParams();
 
@@ -28,10 +30,9 @@ function User(props) {
     hireable,
   } = user;
 
-  console.log("user", user);
-
   useEffect(() => {
     getUser(params.userLogin);
+    getUserRepos(params.userLogin);
   }, []);
 
   if (loading) return <Loader />;
@@ -163,7 +164,7 @@ function User(props) {
           </div>
         </div>
 
-        {/*<RepoList repos={repos} />*/}
+        <RepoList repos={repos} />
       </div>
     </Fragment>
   );
