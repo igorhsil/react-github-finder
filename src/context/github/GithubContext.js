@@ -1,6 +1,6 @@
 import React, { createContext, useReducer } from "react";
 import githubReducer from "./GithubReducers";
-import seeds from "../../seeds";
+// import seeds from "../../seeds";
 
 const GithubContext = createContext();
 
