@@ -18,6 +18,7 @@ export const GithubProvider = ({ children }) => {
   const initialState = {
     users: [],
     loading: false,
+    user: {},
   };
 
   const [state, dispatch] = useReducer(githubReducer, initialState);
@@ -48,6 +49,32 @@ export const GithubProvider = ({ children }) => {
     }
   };
 
+  // get single user
+  const getUser = async (user) => {
+    setLoading();
+
+    try {
+      const res = await fetch(`${GITHUB_URL}/users/${user}`, {
+        // headers: {
+        //   Authorization: `Token ${GITHUB_TOKEN}`,
+        // },
+      });
+
+      if (res.status === 404) {
+        window.location = "/notfound";
+      } else {
+        const data = await res.json();
+
+        dispatch({
+          type: "GET_USER",
+          payload: data,
+        });
+      }
+    } catch (err) {
+      console.log("Error: ", err);
+    }
+  };
+
   // clear users from state
   const clearUsers = () => {
     dispatch({
@@ -67,7 +94,9 @@ export const GithubProvider = ({ children }) => {
       value={{
         users: state.users,
         loading: state.loading,
+        user: state.user,
         searchUsers,
+        getUser,
         clearUsers,
       }}
     >
