@@ -1,6 +1,7 @@
 import React, { createContext, useReducer } from "react";
 import githubReducer from "./GithubReducers";
-import seeds from "../../seeds";
+import { useParams } from "react-router-dom";
+// import seeds from "../../seeds";
 
 const GithubContext = createContext();
 
@@ -19,6 +20,7 @@ export const GithubProvider = ({ children }) => {
     users: [],
     loading: false,
     user: {},
+    repos: [],
   };
 
   const [state, dispatch] = useReducer(githubReducer, initialState);
@@ -75,6 +77,37 @@ export const GithubProvider = ({ children }) => {
     }
   };
 
+  // get user repos
+  const getUserRepos = async (user) => {
+    setLoading();
+
+    const params = new URLSearchParams({
+      sort: "created",
+      per_page: 10,
+    });
+
+    try {
+      const res = await fetch(`${GITHUB_URL}/users/${user}/repos?${params}`, {
+        // headers: {
+        //   Authorization: `Token ${GITHUB_TOKEN}`,
+        // },
+      });
+
+      if (res.status === 404) {
+        window.location = "/notfound";
+      } else {
+        const data = await res.json();
+
+        dispatch({
+          type: "GET_REPOS",
+          payload: data,
+        });
+      }
+    } catch (err) {
+      console.log("Error: ", err);
+    }
+  };
+
   // clear users from state
   const clearUsers = () => {
     dispatch({
@@ -95,8 +128,10 @@ export const GithubProvider = ({ children }) => {
         users: state.users,
         loading: state.loading,
         user: state.user,
+        repos: state.repos,
         searchUsers,
         getUser,
+        getUserRepos,
         clearUsers,
       }}
     >
